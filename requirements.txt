@@ -1,0 +1,7 @@
+# requrements for karpal
+numpy
+nltk
+progressbar2
+system-query
+traitlets
+tqdm
