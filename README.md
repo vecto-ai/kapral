@@ -1,2 +1,0 @@
-# kapral
-Corpus tools
