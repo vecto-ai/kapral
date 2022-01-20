@@ -3,7 +3,7 @@ import os
 from collections import namedtuple
 
 import numpy as np
-from vecto.utils.data import get_uncompressed_size
+from kapral.utils.data import get_uncompressed_size
 from vecto.utils.metadata import WithMetaData
 
 from .iterators import (CharIterator, DirIterator, FileIterator,

@@ -6,8 +6,8 @@ import json
 import random
 import sys
 
+from kapral.corpus import Corpus
 from transformers import AutoTokenizer
-from vecto.corpus import Corpus
 
 
 def simple_char_iter(text):
