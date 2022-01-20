@@ -3,9 +3,10 @@ import fnmatch
 import logging
 import os
 
-from vecto.corpus.base import BaseIterator
-from vecto.corpus.tokenization import DEFAULT_SENT_TOKENIZER, DEFAULT_TOKENIZER
-from vecto.utils.data import detect_archive_format_and_open
+from kapral.corpus.base import BaseIterator
+from kapral.corpus.tokenization import (DEFAULT_SENT_TOKENIZER,
+                                        DEFAULT_TOKENIZER)
+from kapral.utils.data import detect_archive_format_and_open
 
 logger = logging.getLogger(__name__)
 
