@@ -10,6 +10,20 @@ from kapral.utils.data import detect_archive_format_and_open
 
 logger = logging.getLogger(__name__)
 
+other_delimiters = {"?", "!", "。"}
+
+known_abbreviations = {"md", "bs", "mr", "ms"}
+
+
+def is_abbreviation(token):
+    if "." in token:
+        return True
+    if len(token) == 1:
+        return True
+    if token.lower() in known_abbreviations:
+        return True
+    return False
+
 
 class FileIterator(BaseIterator):
     """
@@ -249,6 +263,50 @@ class SlidingWindowIterator(BaseIterator):
                 yield dict(current=current,
                            context=ctx)
 
+
+# TODO: make it fit into same class hierarchy
+def sentence_iter(char_iter):
+    """
+    this is clumsy, but better than nothing
+    (and also seems to be better compared to spacy and nltk)
+    and not particulalry fast (yet)
+    approach to chop off complete sentences from a character stream
+    and pack them into sequences of given length
+    """
+    size_buffer = 10000
+    buffer = [" "] * size_buffer
+    pos = 0
+    prev_char = ""
+    prev_token = ""
+    for c in char_iter:
+        is_sentence_end = False
+        if c == " " and prev_char == ".":
+            # print(prev_token)
+            if not is_abbreviation(prev_token[:-1]):
+                is_sentence_end = True
+        if prev_char in other_delimiters and c != "\"":
+            is_sentence_end = True
+            # buffer[pos] = c
+            # pos += 1
+        if is_sentence_end:
+            if pos > 0:
+                yield "".join(buffer[: pos]).strip()
+            buffer = [" "] * size_buffer
+            pos = 0
+            continue
+        prev_char = c
+        if pos >= len(buffer):
+            print("buffer overflow:")
+            # print("".join(buffer[:100]))
+            print("".join(buffer[-100:]))
+            pos = 0
+        buffer[pos] = c
+        prev_token += c
+        if c == " ":
+            prev_token = ""
+        pos += 1
+    if pos > 0:
+        yield "".join(buffer[: pos])
 
 # class SlidingWindowAndGlobal(BaseIterator):
 #     def __init__(self, base_corpus, left_ctx_size=2, right_ctx_size=2, verbose=0):
