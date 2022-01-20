@@ -54,14 +54,16 @@ class BaseCorpus(WithMetaData):
         return CharIterator(self.get_line_iterator(verbose))
 
     def get_sentence_iterator(self, tokenizer=None, verbose=False):
-        if tokenizer is None:
-            if self.language == 'jap':
-                tokenizer = DEFAULT_JAP_TOKENIZER
-            else:
-                tokenizer = DEFAULT_SENT_TOKENIZER
-        return TokenizedSequenceIterator(self.get_line_iterator(verbose=verbose),
-                                         tokenizer=tokenizer,
-                                         verbose=verbose)
+        # this is old code that doesn't support line breaks over sentences
+        # if tokenizer is None:
+        #     if self.language == 'jap':
+        #         tokenizer = DEFAULT_JAP_TOKENIZER
+        #     else:
+        #         tokenizer = DEFAULT_SENT_TOKENIZER
+        # return TokenizedSequenceIterator(self.get_line_iterator(verbose=verbose),
+        #                                  tokenizer=tokenizer,
+        #                                  verbose=verbose)
+        return SequenceIterator(self.get_character_iterator())
 
     def get_sequence_iterator(self, sequence_length, tokenizer):
         return SequenceIterator(self.get_line_iterator(),
