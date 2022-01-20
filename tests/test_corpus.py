@@ -1,8 +1,9 @@
 """Tests for corpus module."""
 
 import unittest
+
 import numpy as np
-from kapral.corpus import FileCorpus, DirCorpus, load_path_as_ids
+from kapral.corpus import DirCorpus, FileCorpus, load_path_as_ids
 from vecto.vocabulary import Vocabulary
 
 # todo: use local vocab
@@ -130,7 +131,7 @@ class Tests(unittest.TestCase):
         corpus = FileCorpus(path_text_file)
         sentence_iter = corpus.get_sentence_iterator(verbose=True)
         for s in sentence_iter:
-            assert s == ['family', 'dashwood', 'long', 'settled', 'sussex', '.']
+            assert s == "The family of Dashwood had long been settled in Sussex."
             break
 
     def test_sliding_window(self):
@@ -164,4 +165,3 @@ class Tests(unittest.TestCase):
     #    assert metadata == TEST_RIGHT_METADATA
 
 Tests().test_sentence()
-

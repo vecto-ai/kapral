@@ -7,8 +7,8 @@ from kapral.utils.data import get_uncompressed_size
 from vecto.utils.metadata import WithMetaData
 
 from .iterators import (CharIterator, DirIterator, FileIterator,
-                        FileLineIterator, LoopedLineIterator, SequenceIterator,
-                        SlidingWindowIterator, TokenIterator,
+                        FileLineIterator, LoopedLineIterator, SentenceIterator,
+                        SequenceIterator, SlidingWindowIterator, TokenIterator,
                         TokenizedSequenceIterator, ViewLineIterator)
 from .tokenization import (DEFAULT_JAP_TOKENIZER, DEFAULT_SENT_TOKENIZER,
                            DEFAULT_TOKENIZER)
@@ -38,7 +38,7 @@ class BaseCorpus(WithMetaData):
             else:
                 tokenizer = DEFAULT_TOKENIZER
         return SlidingWindowIterator(
-            self.get_sentence_iterator(tokenizer=tokenizer),
+            self.get_tokenized_line_iterator(tokenizer=tokenizer),
             left_ctx_size=left_ctx_size,
             right_ctx_size=right_ctx_size)
 
@@ -48,22 +48,23 @@ class BaseCorpus(WithMetaData):
                 tokenizer = DEFAULT_JAP_TOKENIZER
             else:
                 tokenizer = DEFAULT_TOKENIZER
-        return TokenIterator(self.get_sentence_iterator(tokenizer, verbose))
+        return TokenIterator(self.get_tokenized_line_iterator(tokenizer, verbose))
 
     def get_character_iterator(self, verbose=False):
         return CharIterator(self.get_line_iterator(verbose))
 
+    def get_tokenized_line_iterator(self, tokenizer=None, verbose=False):
+        if tokenizer is None:
+            if self.language == 'jap':
+                tokenizer = DEFAULT_JAP_TOKENIZER
+            else:
+                tokenizer = DEFAULT_SENT_TOKENIZER
+        return TokenizedSequenceIterator(self.get_line_iterator(verbose=verbose),
+                                         tokenizer=tokenizer,
+                                         verbose=verbose)
+
     def get_sentence_iterator(self, tokenizer=None, verbose=False):
-        # this is old code that doesn't support line breaks over sentences
-        # if tokenizer is None:
-        #     if self.language == 'jap':
-        #         tokenizer = DEFAULT_JAP_TOKENIZER
-        #     else:
-        #         tokenizer = DEFAULT_SENT_TOKENIZER
-        # return TokenizedSequenceIterator(self.get_line_iterator(verbose=verbose),
-        #                                  tokenizer=tokenizer,
-        #                                  verbose=verbose)
-        return SequenceIterator(self.get_character_iterator())
+        return SentenceIterator(self.get_character_iterator())
 
     def get_sequence_iterator(self, sequence_length, tokenizer):
         return SequenceIterator(self.get_line_iterator(),

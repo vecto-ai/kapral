@@ -7,6 +7,7 @@ from kapral.corpus.base import BaseIterator
 from kapral.corpus.tokenization import (DEFAULT_SENT_TOKENIZER,
                                         DEFAULT_TOKENIZER)
 from kapral.utils.data import detect_archive_format_and_open
+from vecto.utils.metadata import WithMetaData
 
 logger = logging.getLogger(__name__)
 
@@ -265,7 +266,7 @@ class SlidingWindowIterator(BaseIterator):
 
 
 # TODO: make it fit into same class hierarchy
-def sentence_iter(char_iter):
+def SentenceIterator(char_iter):
     """
     this is clumsy, but better than nothing
     (and also seems to be better compared to spacy and nltk)
