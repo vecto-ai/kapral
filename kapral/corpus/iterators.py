@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 other_delimiters = {"?", "!", "。"}
 
-known_abbreviations = {"md", "bs", "mr", "ms"}
+known_abbreviations = {"md", "bs", "mr", "ms", "st"}
 
 
 def is_abbreviation(token):
