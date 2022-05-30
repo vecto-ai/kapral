@@ -136,8 +136,8 @@ class Corpus(BaseCorpus):
         return iterator
 
     def get_document_iterator(self):
-        dir_iter = DirIterator(self.path, verbose=False, yield_eod=True)
-        line_iter = FileLineIterator(dir_iter)
+        dir_iter = DirIterator(self.path, verbose=False)
+        line_iter = FileLineIterator(dir_iter, yield_eod=True)
         last_doc = None
         while True:
             if last_doc != None:
@@ -259,4 +259,6 @@ def load_path_as_ids(path, vocabulary, tokenizer=DEFAULT_TOKENIZER):
 
 
 class Document:
-    pass
+    def __init__(self, line_iter):
+        self.line_iter = line_iter
+        self.reached_eod = False
