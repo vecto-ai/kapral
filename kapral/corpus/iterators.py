@@ -7,13 +7,18 @@ from kapral.corpus.base import BaseIterator
 from kapral.corpus.tokenization import (DEFAULT_SENT_TOKENIZER,
                                         DEFAULT_TOKENIZER)
 from kapral.utils.data import detect_archive_format_and_open
-from vecto.utils.metadata import WithMetaData
+
+# from vecto.utils.metadata import WithMetaData
 
 logger = logging.getLogger(__name__)
 
 other_delimiters = {"?", "!", "。"}
 
 known_abbreviations = {"md", "bs", "mr", "ms", "st", "lit"}
+
+
+class EOD:
+    pass
 
 
 def is_abbreviation(token):
@@ -66,7 +71,7 @@ class FileLineIterator(BaseIterator):
     Receives a sequence of filenames from `base_corpus` and reads each file line-by-line.
     """
 
-    def __init__(self, base_corpus, verbose=0):
+    def __init__(self, base_corpus, verbose=0, yield_eod=False):
         super(FileLineIterator, self).__init__(base_corpus=base_corpus.metadata,
                                                verbose=verbose)
         self.base_corpus = base_corpus
@@ -78,6 +83,7 @@ class FileLineIterator(BaseIterator):
                     line = line.strip()
                     if line:
                         yield line
+        yield EOD()
 
 
 def seek_unicode(fp, position, direction=-1):
@@ -248,7 +254,7 @@ class SlidingWindowIterator(BaseIterator):
         self.base_corpus = base_corpus
         self.left_ctx_size = left_ctx_size
         self.right_ctx_size = right_ctx_size
-        self.__gen__  = self._generate_samples()
+        self.__gen__ = self._generate_samples()
 
     def __iter__(self):
         return self

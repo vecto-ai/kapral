@@ -125,8 +125,8 @@ class Corpus(BaseCorpus):
                 lo = current + 1
 
     def get_line_iterator(self, verbose=False):
-        # TODO: can be more optimal w/o using view
-        return CorpusView(self, 0, 1).get_line_iterator()
+        dir_iter = DirIterator(self.path, verbose=verbose)
+        return FileLineIterator(dir_iter)
 
     def get_looped_line_iterator(self, rank=0, size=1):
         assert rank < size
@@ -134,6 +134,16 @@ class Corpus(BaseCorpus):
         node_start = self.get_file_and_offset(byte_start, start_of_range=True, epsilon=0)
         iterator = LoopedLineIterator(self.tree, node_start)
         return iterator
+
+    def get_document_iterator(self):
+        dir_iter = DirIterator(self.path, verbose=False, yield_eod=True)
+        line_iter = FileLineIterator(dir_iter)
+        last_doc = None
+        while True:
+            if last_doc != None:
+                assert last_doc.reached_eod
+            last_doc = Document(line_iter)
+            yield last_doc
 
 
 class CorpusView(BaseCorpus):
@@ -162,18 +172,18 @@ class CorpusView(BaseCorpus):
 
 
 # TODO: make this deprecated and use Corpus instead
-class FileCorpus(BaseCorpus):
-    """Cepresents a body of text in a single file"""
+# class FileCorpus(BaseCorpus):
+#     """Cepresents a body of text in a single file"""
 
-    def get_line_iterator(self, verbose=False):
-        return FileLineIterator(FileIterator(self.path, verbose=verbose))
+#     def get_line_iterator(self, verbose=False):
+#         return FileLineIterator(FileIterator(self.path, verbose=verbose))
 
 
-class DirCorpus(BaseCorpus):
-    """Cepresents a body of text in a directory"""
+# class DirCorpus(BaseCorpus):
+#     """Cepresents a body of text in a directory"""
 
-    def get_line_iterator(self, verbose=False):
-        return FileLineIterator(DirIterator(self.path, verbose=verbose))
+#     def get_line_iterator(self, verbose=False):
+#         return FileLineIterator(DirIterator(self.path, verbose=verbose))
 
 
 # old code below ----------------------------------
@@ -246,3 +256,7 @@ def load_path_as_ids(path, vocabulary, tokenizer=DEFAULT_TOKENIZER):
         w = token  # specify what to do with missing words
         result.append(vocabulary.get_id(w))
     return np.array(result, dtype=np.int32)
+
+
+class Document:
+    pass
