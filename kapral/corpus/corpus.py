@@ -144,7 +144,7 @@ class Corpus(BaseCorpus):
                 if last_doc.reached_eoc:
                     break
                     # raise StopIteration
-                assert last_doc.reached_eod
+                assert last_doc.reached_eod, "Can't yield new document until the previous one exhausts its line iterator"
             last_doc = Document(line_iter)
             yield last_doc
 
