@@ -77,21 +77,21 @@ class FileLineIterator(BaseIterator):
         self.yield_eod = yield_eod
 
     def _generate_samples(self):
-        was_eod = True
+        suppress_eod = True  # True to not yeld epty doc at the beginning
         for filename in self.base_corpus:
-            if self.yield_eod and not was_eod:
+            if self.yield_eod and not suppress_eod:
                 yield EOD
-                was_eod = True
+                suppress_eod = True
             with detect_archive_format_and_open(filename) as file_in:
                 for line in file_in:
                     line = line.strip()
                     if line:
                         yield line
-                        was_eod = False
+                        suppress_eod = False
                     else:
-                        if self.yield_eod and not was_eod:
+                        if self.yield_eod and not suppress_eod:
                             yield EOD
-                            was_eod = True
+                            suppress_eod = True
 
 
 def seek_unicode(fp, position, direction=-1):
