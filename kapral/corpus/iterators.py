@@ -77,8 +77,11 @@ class FileLineIterator(BaseIterator):
         self.yield_eod = yield_eod
 
     def _generate_samples(self):
-        was_eod = False
+        was_eod = True
         for filename in self.base_corpus:
+            if self.yield_eod and not was_eod:
+                yield EOD
+                was_eod = True
             with detect_archive_format_and_open(filename) as file_in:
                 for line in file_in:
                     line = line.strip()
@@ -89,9 +92,6 @@ class FileLineIterator(BaseIterator):
                         if self.yield_eod and not was_eod:
                             yield EOD
                             was_eod = True
-            if self.yield_eod and not was_eod:
-                yield EOD
-                was_eod = True
 
 
 def seek_unicode(fp, position, direction=-1):
