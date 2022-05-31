@@ -267,9 +267,11 @@ class Document(BaseCorpus):
         self.line_iter = line_iter
         self.reached_eod = False
         self.reached_eoc = False
+        print("INIT NEW DOC")
 
     def line_iter_wrapper(self, **kwargs):
         for line in self.line_iter:
+            print("GOT from inner line iter:", line)
             # while True:
             # line = next(self.line_iter)
             if line is EOD:

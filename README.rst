@@ -5,11 +5,7 @@ KAPRAL
     :target: https://travis-ci.com/vecto-ai/vecto
     :alt: build status from Travis CI
 
-.. image:: https://ci.appveyor.com/api/projects/status/github/vecto-ai/vecto?branch=master&svg=true
-    :target: https://ci.appveyor.com/project/undertherain/vecto
-    :alt: build status from AppVeyor
-
-.. image:: https://coveralls.io/repos/github/vecto-ai/vecto/badge.svg?branch=master
+.. image:: https://coveralls.io/repos/github/vecto-ai/kapral/badge.svg?branch=master
     :target: https://coveralls.io/github/vecto-ai/vecto?branch=master
     :alt: coveralls badge
 
@@ -17,13 +13,9 @@ KAPRAL
     :target: https://www.codacy.com/app/undertherain/vecto
     :alt: grade from Codacy
 
-.. image:: https://badge.fury.io/py/vecto.svg
-    :target: https://badge.fury.io/py/vecto
+.. image:: https://badge.fury.io/py/kapral.svg
+    :target: https://badge.fury.io/py/kapral
     :alt: pypi version
-
-.. image:: https://badges.gitter.im/badge.svg
-   :alt: Join the chat at https://gitter.im/vecto-ai/Lobby
-   :target: https://gitter.im/vecto-ai/Lobby
 
 Kapral helps to perform a range of tasks within the framework of corpus linguistics
 
