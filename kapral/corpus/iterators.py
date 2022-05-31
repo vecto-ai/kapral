@@ -74,6 +74,7 @@ class FileLineIterator(BaseIterator):
         super(FileLineIterator, self).__init__(base_corpus=base_corpus.metadata,
                                                verbose=verbose)
         self.base_corpus = base_corpus
+        self.yield_eod = yield_eod
 
     def _generate_samples(self):
         for filename in self.base_corpus:
@@ -82,7 +83,8 @@ class FileLineIterator(BaseIterator):
                     line = line.strip()
                     if line:
                         yield line
-            yield EOD
+            if self.yield_eod:
+                yield EOD
 
 
 def seek_unicode(fp, position, direction=-1):
@@ -161,11 +163,11 @@ class TokenizedSequenceIterator(BaseIterator):
         super(TokenizedSequenceIterator, self).__init__(base_corpus=base_corpus.metadata,
                                                         tokenizer=tokenizer.metadata,
                                                         verbose=verbose)
-        self.base_corpus = base_corpus
+        self.line_iterator = base_corpus
         self.tokenizer = tokenizer
 
     def _generate_samples(self):
-        for line in self.base_corpus:
+        for line in self.line_iterator:
             # TODO: sentence may span over multiple lines, we should take this into account somehow
             # I think that it's better to ignore this here and write docs like:
             # "You should be aware of that and prepare your data accordingly, e.g. one line - one real doc"

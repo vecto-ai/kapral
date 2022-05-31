@@ -249,7 +249,7 @@ def load_path_as_ids(path, vocabulary, tokenizer=DEFAULT_TOKENIZER):
     result = []
     if os.path.isfile(path):
         # TODO: why file corpus does not need language? 
-        ti = FileCorpus(path).get_token_iterator(tokenizer=tokenizer)
+        ti = Corpus(path).get_token_iterator(tokenizer=tokenizer)
     else:
         if os.path.isdir(path):
             ti = DirCorpus(path).get_token_iterator(tokenizer)
