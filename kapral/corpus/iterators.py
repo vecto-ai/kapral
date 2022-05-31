@@ -18,7 +18,7 @@ known_abbreviations = {"md", "bs", "mr", "ms", "st", "lit"}
 
 
 EOD = object()
-EOC = object()
+
 
 def is_abbreviation(token):
     if "." in token:

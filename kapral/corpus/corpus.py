@@ -6,7 +6,7 @@ import numpy as np
 from kapral.utils.data import get_uncompressed_size
 from vecto.utils.metadata import WithMetaData
 
-from .iterators import (EOC, EOD, CharIterator, DirIterator, FileIterator,
+from .iterators import (EOD, CharIterator, DirIterator, FileIterator,
                         FileLineIterator, LoopedLineIterator, SentenceIterator,
                         SequenceIterator, SlidingWindowIterator, TokenIterator,
                         TokenizedSequenceIterator, ViewLineIterator)
