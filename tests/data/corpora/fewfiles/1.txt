@@ -1,3 +1,3 @@
-paragraph one, goes on
+first file, first para
 
-and another let's say document
+first file, second para

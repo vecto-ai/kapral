@@ -17,9 +17,8 @@ other_delimiters = {"?", "!", "。"}
 known_abbreviations = {"md", "bs", "mr", "ms", "st", "lit"}
 
 
-class EOD:
-    pass
-
+EOD = object()
+EOC = object()
 
 def is_abbreviation(token):
     if "." in token:
@@ -83,7 +82,7 @@ class FileLineIterator(BaseIterator):
                     line = line.strip()
                     if line:
                         yield line
-        yield EOD()
+            yield EOD
 
 
 def seek_unicode(fp, position, direction=-1):

@@ -6,7 +6,7 @@ import numpy as np
 from kapral.utils.data import get_uncompressed_size
 from vecto.utils.metadata import WithMetaData
 
-from .iterators import (CharIterator, DirIterator, FileIterator,
+from .iterators import (EOC, EOD, CharIterator, DirIterator, FileIterator,
                         FileLineIterator, LoopedLineIterator, SentenceIterator,
                         SequenceIterator, SlidingWindowIterator, TokenIterator,
                         TokenizedSequenceIterator, ViewLineIterator)
@@ -50,8 +50,8 @@ class BaseCorpus(WithMetaData):
                 tokenizer = DEFAULT_TOKENIZER
         return TokenIterator(self.get_tokenized_line_iterator(tokenizer, verbose))
 
-    def get_character_iterator(self, verbose=False):
-        return CharIterator(self.get_line_iterator(verbose))
+    def get_character_iterator(self, verbose=False, yield_eod=False):
+        return CharIterator(self.get_line_iterator(verbose=verbose, yield_eod=yield_eod))
 
     def get_tokenized_line_iterator(self, tokenizer=None, verbose=False):
         if tokenizer is None:
@@ -124,9 +124,9 @@ class Corpus(BaseCorpus):
             if self.tree[current].bytes < global_position:
                 lo = current + 1
 
-    def get_line_iterator(self, verbose=False):
+    def get_line_iterator(self, verbose=False, yield_eod=False):
         dir_iter = DirIterator(self.path, verbose=verbose)
-        return FileLineIterator(dir_iter)
+        return FileLineIterator(dir_iter, yield_eod=yield_eod)
 
     def get_looped_line_iterator(self, rank=0, size=1):
         assert rank < size
@@ -141,6 +141,9 @@ class Corpus(BaseCorpus):
         last_doc = None
         while True:
             if last_doc != None:
+                if last_doc.reached_eoc:
+                    break
+                    # raise StopIteration
                 assert last_doc.reached_eod
             last_doc = Document(line_iter)
             yield last_doc
@@ -262,3 +265,18 @@ class Document:
     def __init__(self, line_iter):
         self.line_iter = line_iter
         self.reached_eod = False
+        self.reached_eoc = False
+
+    def line_iter_wrapper(self):
+        for line in self.line_iter:
+            # while True:
+            # line = next(self.line_iter)
+            if line is EOD:
+                self.reached_eod = True
+                break
+            yield line
+        else:
+            self.reached_eoc = True
+
+    def get_line_iterator(self):
+        return self.line_iter_wrapper()
