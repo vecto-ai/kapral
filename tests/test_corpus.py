@@ -155,5 +155,3 @@ class Tests(unittest.TestCase):
     #                        DirTokenCorpus(path_text))
     #    metadata = json.dumps(corp.metadata, indent=4, sort_keys=True).strip()
     #    assert metadata == TEST_RIGHT_METADATA
-
-# Tests().test_sentence()
