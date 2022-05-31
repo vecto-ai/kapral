@@ -7,13 +7,17 @@ from kapral.corpus.base import BaseIterator
 from kapral.corpus.tokenization import (DEFAULT_SENT_TOKENIZER,
                                         DEFAULT_TOKENIZER)
 from kapral.utils.data import detect_archive_format_and_open
-from vecto.utils.metadata import WithMetaData
+
+# from vecto.utils.metadata import WithMetaData
 
 logger = logging.getLogger(__name__)
 
 other_delimiters = {"?", "!", "。"}
 
 known_abbreviations = {"md", "bs", "mr", "ms", "st", "lit"}
+
+
+EOD = object()
 
 
 def is_abbreviation(token):
@@ -66,10 +70,11 @@ class FileLineIterator(BaseIterator):
     Receives a sequence of filenames from `base_corpus` and reads each file line-by-line.
     """
 
-    def __init__(self, base_corpus, verbose=0):
+    def __init__(self, base_corpus, verbose=0, yield_eod=False):
         super(FileLineIterator, self).__init__(base_corpus=base_corpus.metadata,
                                                verbose=verbose)
         self.base_corpus = base_corpus
+        self.yield_eod = yield_eod
 
     def _generate_samples(self):
         for filename in self.base_corpus:
@@ -78,6 +83,8 @@ class FileLineIterator(BaseIterator):
                     line = line.strip()
                     if line:
                         yield line
+            if self.yield_eod:
+                yield EOD
 
 
 def seek_unicode(fp, position, direction=-1):
@@ -156,11 +163,11 @@ class TokenizedSequenceIterator(BaseIterator):
         super(TokenizedSequenceIterator, self).__init__(base_corpus=base_corpus.metadata,
                                                         tokenizer=tokenizer.metadata,
                                                         verbose=verbose)
-        self.base_corpus = base_corpus
+        self.line_iterator = base_corpus
         self.tokenizer = tokenizer
 
     def _generate_samples(self):
-        for line in self.base_corpus:
+        for line in self.line_iterator:
             # TODO: sentence may span over multiple lines, we should take this into account somehow
             # I think that it's better to ignore this here and write docs like:
             # "You should be aware of that and prepare your data accordingly, e.g. one line - one real doc"
@@ -203,8 +210,7 @@ class SequenceIterator(BaseIterator):
 
 class BaseNestedIterator(BaseIterator):
     def __init__(self, parent_iterator, verbose=0):
-        # TODO: this .metadata seems strange
-        super().__init__(parent_iterator=parent_iterator.metadata,
+        super().__init__(parent_iterator=parent_iterator,
                          verbose=verbose)
         self.parent_iterator = parent_iterator
 
@@ -248,7 +254,7 @@ class SlidingWindowIterator(BaseIterator):
         self.base_corpus = base_corpus
         self.left_ctx_size = left_ctx_size
         self.right_ctx_size = right_ctx_size
-        self.__gen__  = self._generate_samples()
+        self.__gen__ = self._generate_samples()
 
     def __iter__(self):
         return self

@@ -6,7 +6,7 @@ import numpy as np
 from kapral.utils.data import get_uncompressed_size
 from vecto.utils.metadata import WithMetaData
 
-from .iterators import (CharIterator, DirIterator, FileIterator,
+from .iterators import (EOD, CharIterator, DirIterator, FileIterator,
                         FileLineIterator, LoopedLineIterator, SentenceIterator,
                         SequenceIterator, SlidingWindowIterator, TokenIterator,
                         TokenizedSequenceIterator, ViewLineIterator)
@@ -19,13 +19,8 @@ logger = logging.getLogger(__name__)
 TreeElement = namedtuple('TreeElement', ["filename", "bytes"])
 
 
-class BaseCorpus(WithMetaData):
+class BaseCorpus:
     """Cepresents a body of text in single or multiple files"""
-
-    def __init__(self, path, language='eng'):
-        super().__init__(path)
-        self.path = path
-        self.language = language
 
     def get_sliding_window_iterator(self,
                                     left_ctx_size=2,
@@ -50,8 +45,8 @@ class BaseCorpus(WithMetaData):
                 tokenizer = DEFAULT_TOKENIZER
         return TokenIterator(self.get_tokenized_line_iterator(tokenizer, verbose))
 
-    def get_character_iterator(self, verbose=False):
-        return CharIterator(self.get_line_iterator(verbose))
+    def get_character_iterator(self, verbose=False, yield_eod=False):
+        return CharIterator(self.get_line_iterator(verbose=verbose, yield_eod=yield_eod))
 
     def get_tokenized_line_iterator(self, tokenizer=None, verbose=False):
         if tokenizer is None:
@@ -79,7 +74,13 @@ class BaseCorpus(WithMetaData):
                                 reset_on_new_line=reset_on_new_line)
 
 
-class Corpus(BaseCorpus):
+class Corpus(BaseCorpus, WithMetaData):
+
+    def __init__(self, path, language='eng'):
+        super().__init__(path)
+        self.path = path
+        self.language = language
+
     def load_dir_strucute(self):
         self.tree = []
         accumulated_size = 0
@@ -124,9 +125,9 @@ class Corpus(BaseCorpus):
             if self.tree[current].bytes < global_position:
                 lo = current + 1
 
-    def get_line_iterator(self, verbose=False):
-        # TODO: can be more optimal w/o using view
-        return CorpusView(self, 0, 1).get_line_iterator()
+    def get_line_iterator(self, verbose=False, yield_eod=False):
+        dir_iter = DirIterator(self.path, verbose=verbose)
+        return FileLineIterator(dir_iter, yield_eod=yield_eod)
 
     def get_looped_line_iterator(self, rank=0, size=1):
         assert rank < size
@@ -134,6 +135,19 @@ class Corpus(BaseCorpus):
         node_start = self.get_file_and_offset(byte_start, start_of_range=True, epsilon=0)
         iterator = LoopedLineIterator(self.tree, node_start)
         return iterator
+
+    def get_document_iterator(self):
+        dir_iter = DirIterator(self.path, verbose=False)
+        line_iter = FileLineIterator(dir_iter, yield_eod=True)
+        last_doc = None
+        while True:
+            if last_doc != None:
+                if last_doc.reached_eoc:
+                    break
+                    # raise StopIteration
+                assert last_doc.reached_eod, "Can't yield new document until the previous one exhausts its line iterator"
+            last_doc = Document(line_iter)
+            yield last_doc
 
 
 class CorpusView(BaseCorpus):
@@ -162,18 +176,18 @@ class CorpusView(BaseCorpus):
 
 
 # TODO: make this deprecated and use Corpus instead
-class FileCorpus(BaseCorpus):
-    """Cepresents a body of text in a single file"""
+# class FileCorpus(BaseCorpus):
+#     """Cepresents a body of text in a single file"""
 
-    def get_line_iterator(self, verbose=False):
-        return FileLineIterator(FileIterator(self.path, verbose=verbose))
+#     def get_line_iterator(self, verbose=False):
+#         return FileLineIterator(FileIterator(self.path, verbose=verbose))
 
 
-class DirCorpus(BaseCorpus):
-    """Cepresents a body of text in a directory"""
+# class DirCorpus(BaseCorpus):
+#     """Cepresents a body of text in a directory"""
 
-    def get_line_iterator(self, verbose=False):
-        return FileLineIterator(DirIterator(self.path, verbose=verbose))
+#     def get_line_iterator(self, verbose=False):
+#         return FileLineIterator(DirIterator(self.path, verbose=verbose))
 
 
 # old code below ----------------------------------
@@ -236,7 +250,7 @@ def load_path_as_ids(path, vocabulary, tokenizer=DEFAULT_TOKENIZER):
     result = []
     if os.path.isfile(path):
         # TODO: why file corpus does not need language? 
-        ti = FileCorpus(path).get_token_iterator(tokenizer=tokenizer)
+        ti = Corpus(path).get_token_iterator(tokenizer=tokenizer)
     else:
         if os.path.isdir(path):
             ti = DirCorpus(path).get_token_iterator(tokenizer)
@@ -246,3 +260,24 @@ def load_path_as_ids(path, vocabulary, tokenizer=DEFAULT_TOKENIZER):
         w = token  # specify what to do with missing words
         result.append(vocabulary.get_id(w))
     return np.array(result, dtype=np.int32)
+
+
+class Document(BaseCorpus):
+    def __init__(self, line_iter):
+        self.line_iter = line_iter
+        self.reached_eod = False
+        self.reached_eoc = False
+
+    def line_iter_wrapper(self, **kwargs):
+        for line in self.line_iter:
+            # while True:
+            # line = next(self.line_iter)
+            if line is EOD:
+                self.reached_eod = True
+                break
+            yield line
+        else:
+            self.reached_eoc = True
+
+    def get_line_iterator(self, **kwargs):
+        return self.line_iter_wrapper(**kwargs)
