@@ -140,6 +140,7 @@ class Corpus(BaseCorpus, WithMetaData):
         dir_iter = DirIterator(self.path, verbose=False)
         line_iter = FileLineIterator(dir_iter, yield_eod=True)
         last_doc = None
+        # TODO: this yelds one empty doc at the end of the corpus
         while True:
             if last_doc != None:
                 if last_doc.reached_eoc:
@@ -267,11 +268,9 @@ class Document(BaseCorpus):
         self.line_iter = line_iter
         self.reached_eod = False
         self.reached_eoc = False
-        print("INIT NEW DOC")
 
     def line_iter_wrapper(self, **kwargs):
         for line in self.line_iter:
-            print("GOT from inner line iter:", line)
             # while True:
             # line = next(self.line_iter)
             if line is EOD:

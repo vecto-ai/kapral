@@ -87,13 +87,12 @@ class FileLineIterator(BaseIterator):
                         was_eod = False
                     else:
                         if self.yield_eod and not was_eod:
-                            print("empty line")
                             yield EOD
                             was_eod = True
             if self.yield_eod and not was_eod:
-                print("finished file")
                 yield EOD
                 was_eod = True
+
 
 def seek_unicode(fp, position, direction=-1):
     while position >= 0:
