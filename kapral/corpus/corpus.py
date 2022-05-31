@@ -19,13 +19,8 @@ logger = logging.getLogger(__name__)
 TreeElement = namedtuple('TreeElement', ["filename", "bytes"])
 
 
-class BaseCorpus(WithMetaData):
+class BaseCorpus:
     """Cepresents a body of text in single or multiple files"""
-
-    def __init__(self, path, language='eng'):
-        super().__init__(path)
-        self.path = path
-        self.language = language
 
     def get_sliding_window_iterator(self,
                                     left_ctx_size=2,
@@ -79,7 +74,13 @@ class BaseCorpus(WithMetaData):
                                 reset_on_new_line=reset_on_new_line)
 
 
-class Corpus(BaseCorpus):
+class Corpus(BaseCorpus, WithMetaData):
+
+    def __init__(self, path, language='eng'):
+        super().__init__(path)
+        self.path = path
+        self.language = language
+
     def load_dir_strucute(self):
         self.tree = []
         accumulated_size = 0
@@ -261,13 +262,13 @@ def load_path_as_ids(path, vocabulary, tokenizer=DEFAULT_TOKENIZER):
     return np.array(result, dtype=np.int32)
 
 
-class Document:
+class Document(BaseCorpus):
     def __init__(self, line_iter):
         self.line_iter = line_iter
         self.reached_eod = False
         self.reached_eoc = False
 
-    def line_iter_wrapper(self):
+    def line_iter_wrapper(self, **kwargs):
         for line in self.line_iter:
             # while True:
             # line = next(self.line_iter)
@@ -278,5 +279,5 @@ class Document:
         else:
             self.reached_eoc = True
 
-    def get_line_iterator(self):
-        return self.line_iter_wrapper()
+    def get_line_iterator(self, **kwargs):
+        return self.line_iter_wrapper(**kwargs)

@@ -210,8 +210,7 @@ class SequenceIterator(BaseIterator):
 
 class BaseNestedIterator(BaseIterator):
     def __init__(self, parent_iterator, verbose=0):
-        # TODO: this .metadata seems strange
-        super().__init__(parent_iterator=parent_iterator.metadata,
+        super().__init__(parent_iterator=parent_iterator,
                          verbose=verbose)
         self.parent_iterator = parent_iterator
 
