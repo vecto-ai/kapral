@@ -140,6 +140,7 @@ class Corpus(BaseCorpus, WithMetaData):
         dir_iter = DirIterator(self.path, verbose=False)
         line_iter = FileLineIterator(dir_iter, yield_eod=True)
         last_doc = None
+        # TODO: this yelds one empty doc at the end of the corpus
         while True:
             if last_doc != None:
                 if last_doc.reached_eoc:
