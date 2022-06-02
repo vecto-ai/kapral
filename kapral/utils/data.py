@@ -1,8 +1,8 @@
 import bz2
 import gzip
-import json
 import lzma
-import os
+
+import zstandard
 
 
 def detect_archive_format_and_open(path):
@@ -12,6 +12,8 @@ def detect_archive_format_and_open(path):
         return bz2.open(path, mode="rt", encoding="utf-8", errors="replace")
     if path.endswith(".gz"):
         return gzip.open(path, mode="rt", encoding="utf-8", errors="replace")
+    if path.endswith(".zst"):
+        return zstandard.open(path, mode="rt", encoding="utf-8", errors="replace")
     return open(path, encoding="utf8", errors="replace")
 
 
