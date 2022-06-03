@@ -5,3 +5,4 @@ progressbar2
 system-query
 traitlets
 tqdm
+zstandard
