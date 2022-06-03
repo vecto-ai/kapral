@@ -176,6 +176,14 @@ class CorpusView(BaseCorpus):
         return start, end
 
 
+class BufferCorpus(BaseCorpus):
+    def __init__(self, buffer):
+        self.buffer = buffer
+
+    def get_character_iterator(self):
+        for c in self.buffer:
+            yield c
+
 # TODO: make this deprecated and use Corpus instead
 # class FileCorpus(BaseCorpus):
 #     """Cepresents a body of text in a single file"""

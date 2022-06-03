@@ -1,17 +1,13 @@
 KAPRAL
 ******
 
-.. image:: https://api.travis-ci.com/vecto-ai/vecto.svg?branch=master
-    :target: https://travis-ci.com/vecto-ai/vecto
+.. image:: https://api.travis-ci.com/vecto-ai/kapral.svg?branch=master
+    :target: https://travis-ci.com/vecto-ai/kapral
     :alt: build status from Travis CI
 
 .. image:: https://coveralls.io/repos/github/vecto-ai/kapral/badge.svg?branch=master
-    :target: https://coveralls.io/github/vecto-ai/vecto?branch=master
+    :target: https://coveralls.io/github/vecto-ai/kapral?branch=master
     :alt: coveralls badge
-
-.. image:: https://api.codacy.com/project/badge/Grade/65aabe10113d45819091d005414462ca    
-    :target: https://www.codacy.com/app/undertherain/vecto
-    :alt: grade from Codacy
 
 .. image:: https://badge.fury.io/py/kapral.svg
     :target: https://badge.fury.io/py/kapral
