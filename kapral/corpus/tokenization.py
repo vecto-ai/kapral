@@ -1,12 +1,8 @@
-import nltk
-import re
 import abc
+import re
 
+import nltk
 from vecto.utils.metadata import WithMetaData, get_full_typename
-
-# TODO: ckeck id the data is there
-nltk.download('punkt', quiet=True)
-nltk.download('stopwords', quiet=True)
 
 _DEFAULT_WORD_SPLITTER = nltk.tokenize.WordPunctTokenizer().tokenize
 _WHITESPACE_TOKEN_SPLITTER = re.compile(r'[^\s]+').findall
