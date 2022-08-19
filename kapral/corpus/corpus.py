@@ -184,6 +184,9 @@ class BufferCorpus(BaseCorpus):
         for c in self.buffer:
             yield c
 
+    def get_line_iterator(self):
+        for line in self.buffer.split("\n"):
+            yield line
 # TODO: make this deprecated and use Corpus instead
 # class FileCorpus(BaseCorpus):
 #     """Cepresents a body of text in a single file"""
